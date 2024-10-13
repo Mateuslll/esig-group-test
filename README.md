@@ -117,6 +117,11 @@ net stop postgresql && net start postgresql
 - Adicionar testes unitários e de integração para maior robustez.
 - Implementar autenticação e autorização para controle de acesso.
 
+#Resultado em tela:
+
+![image](https://github.com/user-attachments/assets/cbe0fac4-e75b-43da-bcd7-7065a8def0d2)
+
+
 Contribuições:
 Sinta-se à vontade para fazer um fork deste repositório, abrir issues ou enviar pull requests para melhorias no projeto.
 
