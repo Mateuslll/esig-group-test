@@ -1,0 +1,13 @@
+h1 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+h:dataTable, h:form {
+    margin: 0 auto;
+    width: 80%;
+}
+
+h:form {
+    padding-top: 20px;
+}

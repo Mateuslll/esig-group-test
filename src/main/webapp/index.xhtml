@@ -5,31 +5,79 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
+
 <h:head>
-    <title>JSF Test Page</title>
+    <title>Salários Consolidados</title>
+    <style type="text/css">
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .pagination-buttons {
+            margin-top: 20px;
+        }
+    </style>
 </h:head>
+
 <h:body>
     <h1>Lista de Salários Consolidados</h1>
-    <h:dataTable value="#{pessoaBean.pessoas}" var="pessoa">
-        <h:column>
-            <f:facet name="header">ID</f:facet>
-            #{pessoa.pessoaId}
-        </h:column>
-        <h:column>
-            <f:facet name="header">Nome</f:facet>
-            #{pessoa.nomePessoa}
-        </h:column>
-        <h:column>
-            <f:facet name="header">Cargo</f:facet>
-            #{pessoa.nomeCargo}
-        </h:column>
-        <h:column>
-            <f:facet name="header">Salário</f:facet>
-            #{pessoa.salario}
-        </h:column>
-    </h:dataTable>
+
+    <h:form>
+        <h:dataTable id="pessoaTable" value="#{pessoaBean.paginatedPessoas}" var="pessoa" border="1">
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{pessoa.pessoaId}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Nome</f:facet>
+                #{pessoa.nomePessoa}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Cargo</f:facet>
+                #{pessoa.nomeCargo}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Salário</f:facet>
+                #{pessoa.salario}
+            </h:column>
+        </h:dataTable>
+
+        <div class="pagination-buttons">
+            <h:commandButton value="Anterior" action="#{pessoaBean.previousPage}" disabled="#{pessoaBean.currentPage == 1}" />
+            <h:outputText value=" Página #{pessoaBean.currentPage} de #{pessoaBean.totalPages} " />
+            <h:commandButton value="Próximo" action="#{pessoaBean.nextPage}" disabled="#{pessoaBean.currentPage == pessoaBean.totalPages}" />
+        </div>
+    </h:form>
+
     <h:form>
         <h:commandButton value="Recalcular Salários" action="#{pessoaBean.recalcularSalarios}" />
+        <h:commandButton value="Ir para Início" action="#{pessoaBean.goToFirstPage}" />
+        <h:messages globalOnly="true" layout="inline" style="color: green; margin-left: 10px;" />
     </h:form>
 </h:body>
 </html>

@@ -1,47 +1,112 @@
 package org.esiggroup.esiggrouptest.bean;
 
 
-import org.esiggroup.esiggrouptest.model.PessoaSalarioConsolidado;
+import org.esiggroup.esiggrouptest.model.Pessoa;
+import org.esiggroup.esiggrouptest.service.PessoaService;
 
-import javax.enterprise.context.RequestScoped;
-import javax.faces.bean.ManagedBean;
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.util.List;
 
-@ManagedBean()
 @Named
-@RequestScoped
-public class PessoaBean {
+@ViewScoped
+public class PessoaBean implements Serializable {
 
-    @PersistenceContext
-    private EntityManager em;
+    private static final long serialVersionUID = 1L;
 
-    private List<PessoaSalarioConsolidado> pessoas;
+    @Inject
+    private PessoaService pessoaService;
+    private Pessoa pessoa = new Pessoa();
+    private List<Pessoa> pessoas;
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+    private List<Pessoa> paginatedPessoas;
 
-    // Método para listar todas as pessoas com salários consolidados
-    public List<PessoaSalarioConsolidado> getPessoas() {
-        if (pessoas == null) {
-            pessoas = em.createQuery("SELECT p FROM PessoaSalarioConsolidado p", PessoaSalarioConsolidado.class)
-                    .getResultList();
-        }
-        return pessoas;
+
+    @PostConstruct
+    public void init() {
+        pessoas = pessoaService.findAll();
+        updatePaginatedPessoas();
     }
 
-    // Método para recalcular salários
-    @Transactional
     public void recalcularSalarios() {
-        em.createQuery("DELETE FROM PessoaSalarioConsolidado").executeUpdate();
-
-        em.createNativeQuery(
-                "INSERT INTO pessoa_salario_consolidado (pessoa_id, nome_pessoa, nome_cargo, salario) " +
-                        "SELECT p.id AS pessoa_id, p.nome AS nome_pessoa, c.nome AS nome_cargo, " +
-                        "SUM(CASE WHEN v.tipo = 'CREDITO' THEN v.valor WHEN v.tipo = 'DEBITO' THEN -v.valor ELSE 0 END) AS salario " +
-                        "FROM pessoa p JOIN cargo_vencimentos cv ON p.cargo_id = cv.cargo_id " +
-                        "JOIN cargo c ON cv.cargo_id = c.id JOIN vencimentos v ON cv.vencimento_id = v.id " +
-                        "GROUP BY p.id, p.nome, c.nome"
-        ).executeUpdate();
+        pessoaService.recalcularSalarios();
+        pessoas = pessoaService.findAll();
+        currentPage = 1;
+        updatePaginatedPessoas();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Salários recalculados com sucesso!"));
     }
+    public void goToFirstPage() {
+        currentPage = 1;
+        updatePaginatedPessoas();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Voltou para a primeira página"));
+    }
+
+    public void savePessoa() {
+        if (pessoa != null) {
+            pessoaService.create(pessoa);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pessoa criada com sucesso!"));
+        } else {
+            pessoaService.update(pessoa);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pessoa atualizada com sucesso!"));
+        }
+        pessoas = pessoaService.findAll();
+        pessoa = new Pessoa();
+    }
+
+    public void deletePessoa() {
+        if (pessoa != null) {
+            pessoaService.delete(pessoa.getPessoaId());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pessoa deletada com sucesso!"));
+            pessoas = pessoaService.findAll();
+            pessoa = new Pessoa();
+        }
+    }
+
+    public void editPessoa(Pessoa pessoa) {
+        this.pessoa = pessoa;
+    }
+
+    public List<Pessoa> getPaginatedPessoas() {
+        return paginatedPessoas;
+    }
+
+    public void nextPage() {
+        if (currentPage < getTotalPages()) {
+            currentPage++;
+            System.out.println("Indo para a página: " + currentPage);
+            updatePaginatedPessoas();
+        }
+    }
+
+    public void previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            System.out.println("Voltando para a página: " + currentPage);
+            updatePaginatedPessoas();
+        }
+    }
+
+    public void updatePaginatedPessoas() {
+        paginatedPessoas = pessoaService.getPaginatedPessoas(pessoas, currentPage, rowsPerPage);
+    }
+
+    public int getTotalPages() {
+        return pessoaService.getTotalPages(pessoas, rowsPerPage);
+    }
+
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
 }
