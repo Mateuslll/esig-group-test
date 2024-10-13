@@ -125,8 +125,7 @@ net stop postgresql && net start postgresql
 Contribuições:
 Sinta-se à vontade para fazer um fork deste repositório, abrir issues ou enviar pull requests para melhorias no projeto.
 
--"E tudo o que pedirem em oração, se crerem, vocês receberão".
-- Mateus 21:21-22
+- "E tudo o que pedirem em oração, se crerem, vocês receberão". Mateus 21:21-22
 
 
 
