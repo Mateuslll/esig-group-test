@@ -81,7 +81,7 @@ Para usar o datasource e o driver do PostgreSQL injetados, adicione a seguinte c
 
 - Aqui estão os passos para fazer essa modificação:
 
--Localize o arquivo pg_hba.conf:
+- Localize o arquivo pg_hba.conf:
 
 - No Linux, geralmente está em: /etc/postgresql/13/main/pg_hba.conf.
 - No Windows, o local comum é: C:\Program Files\PostgreSQL\13\data\pg_hba.conf.
